@@ -16,8 +16,8 @@ class TesteListaViewBase(APITestCase):
 
 	def setUp(self):
 		# Usuários de teste
-		self.usuario1 = User.objects.create(username='teste1', password='senha')
-		self.usuario2 = User.objects.create(username='teste2', password='senha')
+		self.usuario1 = User.objects.create_user(username='teste1', password='senha')
+		self.usuario2 = User.objects.create_user(username='teste2', password='senha')
 
 		# Cria dados para teste
 		self.cria_movimentacao("Dividendo Tesla", 15204.23, self.usuario1)
@@ -69,3 +69,37 @@ class PegaMovimentacoesTeste(TesteListaViewBase):
 
 		self.assertEqual(resposta.data, serializado.data)
 		self.assertEqual(resposta.status_code, status.HTTP_200_OK)
+
+
+# Classe para testar rota autenticacao/
+class TesteAutenticacaoView(APITestCase):
+
+	def setUp(self):
+		self.usuario = User.objects.create_user(username='teste', password='senha')
+
+	def teste_autenticacao(self):
+		"""
+		Garante que é possível autenticar a sessão via requisição POST à rota autenticacao/. Também testa se uma requisição GET em lista/ antes de autenticar é proibida.
+		"""
+		# Antes de autenticar
+		resposta_lista = self.client.get(
+			reverse('planilha-lista')
+		)
+
+		self.assertEqual(resposta_lista.status_code, status.HTTP_403_FORBIDDEN)
+
+		# Autenticação
+		resposta_autenticacao = self.client.post(
+			reverse('planilha-autenticacao'),
+			{'username':'teste', 'password':'senha'}
+		)
+
+		# Django LoginView redireciona após o login, fazendo o status retornar 302
+		self.assertEqual(resposta_autenticacao.status_code, status.HTTP_302_FOUND)
+
+		# Após autenticar
+		resposta_lista = self.client.get(
+			reverse('planilha-lista')
+		)
+
+		self.assertEqual(resposta_lista.status_code, status.HTTP_200_OK)
