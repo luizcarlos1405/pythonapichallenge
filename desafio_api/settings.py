@@ -134,3 +134,4 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 LOGIN_REDIRECT_URL = 'planilha-lista'
+LOGIN_URL = 'planilha-autenticacao'
