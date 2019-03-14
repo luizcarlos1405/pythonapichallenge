@@ -4,15 +4,19 @@ from django.views.generic import CreateView
 from django import forms
 from rest_framework.decorators import api_view
 from rest_framework import generics
+from rest_framework import filters
 from .models import Movimentacao
 from .serializers import MovimentacaoSerializer
 
 class ListaMovimentacoesView(generics.ListAPIView):
 	serializer_class = MovimentacaoSerializer
+	filter_backends = (filters.OrderingFilter,)
+	ordering_fields = ('nome', 'valor')
 
 	# Retorna apenas as movimentações do usuário logado
 	def get_queryset(self):
 		q_set = Movimentacao.objects.filter(usuario=self.request.user)
+
 		return q_set
 
 
@@ -22,7 +26,7 @@ class AutenticacaoView(LoginView):
 
 class MovimentacaoForm(forms.ModelForm):
 	ESCOLHAS = (
-		('', ''),
+		('', 'Selecionar'),
 		('entrada', 'Entrada'),
 		('saida', 'Saída'),
 	)

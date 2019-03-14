@@ -208,3 +208,62 @@ class TesteFormularioView(APITestCase):
 
 		# O banco deve possuir apenas 1 valor
 		self.assertEqual(len(serializado.data), 1)
+
+
+# Teste para implementar a funcionalidade de ordenação na rota lista/.
+class TesteOrdenacao(TesteListaViewBase):
+
+	def teste_ordenacao(self):
+		self.cria_movimentacao("Zebra de presente.", 5000.00, self.usuario1)
+		self.cria_movimentacao("Tacos de golfe.", 278.90, self.usuario1)
+
+		# Autenticação
+		self.client.force_authenticate(self.usuario1)
+
+		# Nome ascendente
+		resposta = self.client.get(
+			reverse('planilha-lista'),
+			{'ordering': 'nome'}
+		)
+
+		esperado = Movimentacao.objects.filter(usuario=self.usuario1)
+		esperado = esperado.order_by('nome')
+		serializado = MovimentacaoSerializer(esperado, many=True)
+
+		self.assertListEqual(resposta.data, serializado.data)
+
+		# Nome descendente
+		resposta = self.client.get(
+			reverse('planilha-lista'),
+			{'ordering': '-nome'}
+		)
+
+		esperado = Movimentacao.objects.filter(usuario=self.usuario1)
+		esperado = esperado.order_by('-nome')
+		serializado = MovimentacaoSerializer(esperado, many=True)
+
+		self.assertListEqual(resposta.data, serializado.data)
+
+		# Valor ascendente
+		resposta = self.client.get(
+			reverse('planilha-lista'),
+			{'ordering': 'valor'}
+		)
+
+		esperado = Movimentacao.objects.filter(usuario=self.usuario1)
+		esperado = esperado.order_by('valor')
+		serializado = MovimentacaoSerializer(esperado, many=True)
+
+		self.assertListEqual(resposta.data, serializado.data)
+
+		# Valor descendente
+		resposta = self.client.get(
+			reverse('planilha-lista'),
+			{'ordering': '-valor'}
+		)
+
+		esperado = Movimentacao.objects.filter(usuario=self.usuario1)
+		esperado = esperado.order_by('-valor')
+		serializado = MovimentacaoSerializer(esperado, many=True)
+
+		self.assertListEqual(resposta.data, serializado.data)
