@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 """
 
 import os
+import django_heroku
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -20,12 +21,13 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/2.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '4v23&*ux(ei+)!cst!35j2)f-d-wy406az$#6z#f1-4x$=)^jn'
+# SECRET_KEY = '4v23&*ux(ei+)!cst!35j2)f-d-wy406az$#6z#f1-4x$=)^jn'
+SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = (os.environ.get('DEBUG_VALUE') == "True")
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', 'pythonapichallenge.herokuapp.com']
 
 
 # Application definition
@@ -137,3 +139,5 @@ STATIC_URL = '/static/'
 
 LOGIN_REDIRECT_URL = 'planilha-lista'
 LOGIN_URL = 'planilha-autenticacao'
+
+django_heroku.settings(locals())
